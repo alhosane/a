@@ -1,3 +1,4 @@
+# سكربت PowerShell المعدل
 $headers = @{
     "accept" = "*/*"
     "accept-encoding" = "gzip, deflate, br, zstd"
@@ -15,11 +16,7 @@ $headers = @{
     "user-agent" = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36"
 }
 
-function Generate-MultipartData {
-    param (
-        [string]$voterId
-    )
-
+function generate-multipart-data($voterId) {
     $boundary = "----WebKitFormBoundaryMAKwgQcUHOY7zpU4"
     $data = @"
 --$boundary
@@ -33,6 +30,7 @@ $voterId
 --$boundary
 Content-Disposition: form-data; name="hash"
 
+
 --$boundary
 Content-Disposition: form-data; name="vote"
 
@@ -42,23 +40,22 @@ Content-Disposition: form-data; name="vote"
     return $data
 }
 
-$url = "https://gs-voting.oddb.co/votes"
-
 while ($true) {
-    $randomVoterId = [guid]::NewGuid().ToString()  # Generate random voter ID
-    $data = Generate-MultipartData -voterId $randomVoterId
+    $randomVoterId = [guid]::NewGuid().ToString()  # توليد معرف ناخب عشوائي
+    $data = generate-multipart-data $randomVoterId
 
     try {
-        $response = Invoke-RestMethod -Uri $url -Method Post -Headers $headers -Body $data -ContentType "multipart/form-data; boundary=----WebKitFormBoundaryMAKwgQcUHOY7zpU4"
-        
+        $response = Invoke-RestMethod -Uri "https://gs-voting.oddb.co/votes" -Method Post -Headers $headers -Body $data
+
         if ($response.status -eq 200 -and $response.message -eq "Voting successful." -and $response.more_info -eq "Voting successful.") {
-            Write-Host -ForegroundColor Green "Vote submitted successfully for voterId $randomVoterId: $response"
+            Write-Host "Vote submitted successfully for voterId ${randomVoterId}: ${response}" -ForegroundColor Green
         } else {
-            Write-Host "Unexpected response for voterId $randomVoterId: $response"
+            Write-Host "Unexpected response for voterId ${randomVoterId}: ${response}" -ForegroundColor Red
         }
-    } catch {
-Write-Host "Vote submitted successfully for voterId ${randomVoterId}: ${response}"
-Write-Host "Unexpected response for voterId ${randomVoterId}: ${response}"
-Write-Host -ForegroundColor Yellow "Failed to submit vote for voterId ${randomVoterId}: $($_.Exception.Message)"
+    }
+    catch {
+        Write-Host "Failed to submit vote for voterId ${randomVoterId}: $($_.Exception.Message)" -ForegroundColor Yellow
+        Write-Host "Waiting 30 seconds before retrying..." -ForegroundColor Yellow
+        Start-Sleep -Seconds 30  # الانتظار لمدة 30 ثانية قبل إعادة المحاولة
     }
 }
