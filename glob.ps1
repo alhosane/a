@@ -57,8 +57,8 @@ while ($true) {
             Write-Host "Unexpected response for voterId $randomVoterId: $response"
         }
     } catch {
-        Write-Host -ForegroundColor Yellow "Failed to submit vote for voterId $randomVoterId: $_.Exception.Message"
-        Write-Host "Waiting 35 seconds before retrying..."
-        Start-Sleep -Seconds 35  # Wait for 30 seconds before retrying
+Write-Host "Vote submitted successfully for voterId ${randomVoterId}: ${response}"
+Write-Host "Unexpected response for voterId ${randomVoterId}: ${response}"
+Write-Host -ForegroundColor Yellow "Failed to submit vote for voterId ${randomVoterId}: $($_.Exception.Message)"
     }
 }
